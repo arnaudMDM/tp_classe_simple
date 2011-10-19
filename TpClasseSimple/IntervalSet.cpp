@@ -184,6 +184,15 @@ bool IntervalSet::GetInterval ( long lPos, long& lLeft, long& lRight ) const
 IntervalSet& IntervalSet::Union ( IntervalSet& is2 )
 // Algorithme : trivial
 {
+	if ( Count ( ) == 0 )
+	{
+		return *(new IntervalSet ( *this ));
+	}
+
+	if ( is2.Count ( ) == 0 )
+	{
+		return *(new IntervalSet ( is2 ));
+	}
 
 	IntervalSet * pInter = this;
 	IntervalSet * pInter2 = &is2;
@@ -191,6 +200,7 @@ IntervalSet& IntervalSet::Union ( IntervalSet& is2 )
 	IntervalSet * pInterNew = pInterRetour;
 
 	int borneInfNew, borneSupNew;
+	int nbInterNew = 0;
 
 	while (pInter != 0 && pInter2 != 0)
 	{
@@ -200,6 +210,7 @@ IntervalSet& IntervalSet::Union ( IntervalSet& is2 )
 			pInterNew = pInterNew->suivant;
 			pInterNew->borneInf = pInter2->borneInf;
 			pInterNew->borneSup = pInter2->borneSup;
+			nbInterNew++;
 
 			pInter2 = pInter2->suivant;
 		}
@@ -209,28 +220,31 @@ IntervalSet& IntervalSet::Union ( IntervalSet& is2 )
 			pInterNew = pInterNew->suivant;
 			pInterNew->borneInf = pInter->borneInf;
 			pInterNew->borneSup = pInter->borneSup;
+			nbInterNew++;
 
 			pInter = pInter->suivant;
 		}
 		else
 		{
 			borneInfNew =
-			        pInter->borneInf <= pInter->borneInf ? pInter->borneInf :
+			        pInter->borneInf <= pInter2->borneInf ? pInter->borneInf :
 			                pInter2->borneInf;
 
-			while (pInter != 0 && pInter2 != 0)
+			bool finCroisement = false;
+
+			while (pInter != 0 && pInter2 != 0 && !finCroisement)
 			{
 				if ( pInter2->borneSup < pInter->borneInf )
 				{
 					borneSupNew = pInter2->borneSup;
 					pInter2 = pInter2->suivant;
-					break;
+					finCroisement = true;
 				}
 				else if ( pInter2->borneInf > pInter->borneSup )
 				{
 					borneSupNew = pInter->borneSup;
 					pInter = pInter->suivant;
-					break;
+					finCroisement = true;
 				}
 				else if ( pInter2->borneSup >= pInter->borneSup )
 				{
@@ -242,12 +256,12 @@ IntervalSet& IntervalSet::Union ( IntervalSet& is2 )
 				}
 			}
 
-			if ( pInter == 0 )
+			if ( pInter == 0 && !finCroisement )
 			{
 				borneSupNew = pInter2->borneSup;
 				pInter2 = pInter2->suivant;
 			}
-			else if ( pInter2 == 0 )
+			else if ( pInter2 == 0 && !finCroisement )
 			{
 				borneSupNew = pInter->borneSup;
 				pInter = pInter->suivant;
@@ -257,6 +271,7 @@ IntervalSet& IntervalSet::Union ( IntervalSet& is2 )
 			pInterNew = pInterNew->suivant;
 			pInterNew->borneInf = borneInfNew;
 			pInterNew->borneSup = borneSupNew;
+			nbInterNew++;
 
 		}
 	}
@@ -278,23 +293,97 @@ IntervalSet& IntervalSet::Union ( IntervalSet& is2 )
 		// équivalente au reste de la liste d'intervalle non parcourue
 		// entièrement
 		pInterNew->suivant = new IntervalSet ( *pInter3 );
+		nbInterNew += pInterNew->suivant->Count ( );
 	}
 
-	pInter = pInterRetour;
-	pInterRetour = pInterRetour->suivant;
-	// on "casse" le lien pour éviter une destruction en cascade
-	pInter->suivant = 0;
-	delete (pInter);
+	if ( pInterRetour->suivant != 0 )
+	{
+		pInter = pInterRetour;
+		pInterRetour = pInterRetour->suivant;
+		// on "casse" le lien pour éviter une destruction en cascade
+		pInter->suivant = 0;
+		delete (pInter);
 
-	pInterRetour->updateNbInter ( );
+		pInter = pInterRetour;
+		while (pInter != 0)
+		{
+			pInter->nbInter = nbInterNew--;
+			pInter = pInter->suivant;
+		}
+	}
 
 	return *pInterRetour;
 } //----- Fin de Union
 
-IntervalSet& IntervalSet::Intersection ( IntervalSet& is )
+IntervalSet& IntervalSet::Intersection ( IntervalSet& is2 )
 // Algorithme : trivial
 {
-	return *this;
+	if ( Count ( ) == 0 || is2.Count ( ) == 0 )
+	{
+		return *(new IntervalSet ( ));
+	}
+
+	IntervalSet * pInter = this;
+	IntervalSet * pInter2 = &is2;
+	IntervalSet * pInterRetour = new IntervalSet ( );
+	IntervalSet * pInterNew = pInterRetour;
+
+	int borneInfNew, borneSupNew;
+	int nbInterNew = 0;
+
+	while (pInter != 0 && pInter2 != 0)
+	{
+		if ( pInter2->borneSup < pInter->borneInf )
+		{
+			pInter2 = pInter2->suivant;
+		}
+		else if ( pInter2->borneInf > pInter->borneSup )
+		{
+			pInter = pInter->suivant;
+		}
+		else
+		{
+			borneInfNew =
+			        pInter->borneInf >= pInter2->borneInf ? pInter->borneInf :
+			                pInter2->borneInf;
+			borneSupNew =
+			        pInter->borneSup <= pInter2->borneSup ? pInter->borneSup :
+			                pInter2->borneSup;
+
+			pInterNew->suivant = new IntervalSet ( );
+			pInterNew = pInterNew->suivant;
+			pInterNew->borneInf = borneInfNew;
+			pInterNew->borneSup = borneSupNew;
+			nbInterNew++;
+
+			if ( pInter2->borneSup >= pInter->borneSup )
+			{
+				pInter = pInter->suivant;
+			}
+			else
+			{
+				pInter2 = pInter2->suivant;
+			}
+		}
+	}
+
+	if ( pInterRetour->suivant != 0 )
+	{
+		pInter = pInterRetour;
+		pInterRetour = pInterRetour->suivant;
+		// on "casse" le lien pour éviter une destruction en cascade
+		pInter->suivant = 0;
+		delete (pInter);
+
+		pInter = pInterRetour;
+		while (pInter != 0)
+		{
+			pInter->nbInter = nbInterNew--;
+			pInter = pInter->suivant;
+		}
+	}
+
+	return *pInterRetour;
 } //----- Fin de Intersection
 
 //------------------------------------------------- Surcharge d'opérateurs
@@ -382,7 +471,7 @@ int IntervalSet::updateNbInter ( )
 		return 1;
 	}
 
-	nbInter = suivant->updateNbInter ( )+1;
+	nbInter = suivant->updateNbInter ( ) + 1;
 
 	return nbInter;
 } //----- Fin de updateNbInter
