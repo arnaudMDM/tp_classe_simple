@@ -461,17 +461,3 @@ bool IntervalSet::addRecursive ( long lLeft, long lRight )
 
 	return false;
 } //----- Fin de addRecursive
-
-int IntervalSet::updateNbInter ( )
-// Algorithme : récursif
-{
-	if ( suivant == 0 )
-	{
-		nbInter = 1;
-		return 1;
-	}
-
-	nbInter = suivant->updateNbInter ( ) + 1;
-
-	return nbInter;
-} //----- Fin de updateNbInter

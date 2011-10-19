@@ -109,12 +109,6 @@ protected:
 	// Contrat :
 	//	appelé dans la méthode Add
 
-	int updateNbInter ( );
-	// Mode d'emploi :
-	//	Met à jour le nombre d'intervalles de chaque élément de liste chaînée
-	// Contrat :
-	//	L'objet ne doit pas représenter un ensemble vide
-
 	//----------------------------------------------------- Attributs protégés
 	long borneInf;
 	long borneSup;
