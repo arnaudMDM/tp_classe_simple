@@ -103,12 +103,6 @@ public:
 protected:
 	//----------------------------------------------------- Méthodes protégées
 
-	bool addRecursive ( long lLeft, long lRight );
-	// Mode d'emploi :
-	//	Destructeur classique
-	// Contrat :
-	//	appelé dans la méthode Add
-
 	//----------------------------------------------------- Attributs protégés
 	long borneInf;
 	long borneSup;

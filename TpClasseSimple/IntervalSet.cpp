@@ -48,47 +48,79 @@ bool IntervalSet::Add ( long lLeft, long lRight )
 	{
 		borneInf = lLeft;
 		borneSup = lRight;
-		nbInter++;
+		nbInter = 1;
+
+		return true;
 	}
-	else if ( lRight < borneInf )
-	{ // cas particulier : insertion avant le 1er élément
-		IntervalSet * pInter = new IntervalSet ( *this );
+
+	if ( lRight < borneInf )
+	{
+		IntervalSet * pInterNew = new IntervalSet ( );
+
+		pInterNew->borneInf = borneInf;
+		pInterNew->borneSup = borneSup;
+		pInterNew->nbInter = nbInter;
+		pInterNew->suivant = suivant;
+
 		borneInf = lLeft;
 		borneSup = lRight;
-		suivant = pInter;
+		suivant = pInterNew;
 		nbInter++;
+
+		return true;
 	}
-	else
+
+	IntervalSet * pInter = this;
+
+	while (pInter != 0)
 	{
-		if ( !addRecursive ( lLeft, lRight ) )
+		if ( lLeft > pInter->borneSup )
 		{
+			if ( pInter->suivant == 0 || lRight < pInter->suivant->borneInf )
+			{
+				IntervalSet * pInterNew = new IntervalSet ( );
+
+				pInterNew->borneInf = lLeft;
+				pInterNew->borneSup = lRight;
+				pInterNew->nbInter = pInter->nbInter;
+				pInterNew->suivant = pInter->suivant;
+
+				pInter->suivant = pInterNew;
+				pInter->nbInter++;
+
+				return true;
+			}
+		}
+		else {
 			return false;
 		}
+
+		pInter = pInter->suivant;
 	}
 
-	return true;
+	return false;
 } //----- Fin de Add
 
-bool IntervalSet::Add ( IntervalSet& is )
+bool IntervalSet::Add ( IntervalSet& is2 )
 // Algorithme : trivial
 {
-	if ( is.Count ( ) == 0 )
+	if ( is2.Count ( ) == 0 )
 	{
 		return true;
 	}
 
 	IntervalSet * pInter = this;
-	IntervalSet * pInterIs = &is;
+	IntervalSet * pInter2 = &is2;
 
 	if ( Count ( ) > 0 )
 	{
-		while (pInter != 0 && pInterIs != 0)
+		while (pInter != 0 && pInter2 != 0)
 		{
-			if ( pInterIs->borneSup < pInter->borneInf )
+			if ( pInter2->borneSup < pInter->borneInf )
 			{
-				pInterIs = pInterIs->suivant;
+				pInter2 = pInter2->suivant;
 			}
-			else if ( pInterIs->borneInf > pInter->borneSup )
+			else if ( pInter2->borneInf > pInter->borneSup )
 			{
 				pInter = pInter->suivant;
 			}
@@ -100,12 +132,12 @@ bool IntervalSet::Add ( IntervalSet& is )
 	}
 	// si on sort de la boucle, cela signifie que l'ajout peut être réalisé
 
-	pInterIs = &is;
+	pInter2 = &is2;
 
-	while (pInterIs != 0)
+	while (pInter2 != 0)
 	{
-		Add ( pInterIs->borneInf, pInterIs->borneSup );
-		pInter = pInterIs->suivant;
+		Add ( pInter2->borneInf, pInter2->borneSup );
+		pInter = pInter2->suivant;
 	}
 
 	return true;
@@ -113,7 +145,7 @@ bool IntervalSet::Add ( IntervalSet& is )
 
 bool IntervalSet::Remove ( long lPos )
 // Algorithme : Traitement des cas particuliers (argument invalide, 1er élément
-//		de la liste ou liste d'un seul élément) puis cas général
+// de la liste ou liste d'un seul élément) puis cas général
 {
 	if ( lPos < 0 || lPos >= Count ( ) )
 	{
@@ -432,32 +464,3 @@ IntervalSet::~IntervalSet ( )
 //------------------------------------------------------------------ PRIVE
 
 //----------------------------------------------------- Méthodes protégées
-
-bool IntervalSet::addRecursive ( long lLeft, long lRight )
-// Algorithme :
-{
-	if ( lLeft > borneSup )
-	{
-		if ( suivant == 0 || lRight < suivant->borneInf )
-		{
-			IntervalSet * pInterNew = new IntervalSet ( );
-			pInterNew->Add ( lLeft, lRight );
-			if ( suivant != 0 )
-			{
-				pInterNew->suivant = suivant;
-			}
-			suivant = pInterNew;
-
-			nbInter++;
-			return true;
-		}
-	}
-
-	if ( suivant != 0 && suivant->addRecursive ( lLeft, lRight ) )
-	{
-		nbInter++;
-		return true;
-	}
-
-	return false;
-} //----- Fin de addRecursive
