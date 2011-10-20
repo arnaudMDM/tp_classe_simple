@@ -471,18 +471,9 @@ IntervalSet::~IntervalSet ( )
 	cout << "Appel au destructeur de <IntervalSet>" << endl;
 #endif
 
-	IntervalSet * pInterEssai = suivant;
-	IntervalSet * pInterMemo;
-	while(suivant->suivant != 0)
+	while(suivant != 0)
 	{
-	* pInterMemo = pInterEssai->suivant;
-	pInterEssai->suivant=0;
-	delete pInterEssai;
-	IntervalSet * pInterEssai = pInterMemo;
-	}
-	if (suivant != 0)
-	{
-		delete pInterMemo;
+		Remove(1);
 	}
 
 	// Attention, les objets seront supprimés en cascade au sein d'un intervalle
