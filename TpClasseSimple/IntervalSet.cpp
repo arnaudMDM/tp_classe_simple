@@ -504,7 +504,7 @@ IntervalSet::IntervalSet ( ) :
 } //----- Fin de IntervalSet
 
 IntervalSet::~IntervalSet ( )
-// Algorithme :
+// Algorithme :trivial
 //
 {
 #ifdef MAP
