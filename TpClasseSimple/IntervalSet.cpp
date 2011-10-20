@@ -92,7 +92,7 @@ bool IntervalSet::Add ( long lLeft, long lRight )
 				while(pInterRetour != pInterNew)
 				{
 					pInterRetour->nbInter = nbInterNew;
-					nbInterNew -= 1;
+					nbInterNew--;
 					pInterRetour = pInterRetour->suivant;
 				}
 
@@ -100,7 +100,7 @@ bool IntervalSet::Add ( long lLeft, long lRight )
 			}
 			else
 			{
-				nbInterNew+=1;
+				nbInterNew++;
 			}
 		}
 		else {
