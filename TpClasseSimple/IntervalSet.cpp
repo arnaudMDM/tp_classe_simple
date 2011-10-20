@@ -149,7 +149,7 @@ bool IntervalSet::Add ( IntervalSet& is2 )
 	while (pInter2 != 0)
 	{
 		Add ( pInter2->borneInf, pInter2->borneSup );
-		pInter = pInter2->suivant;
+		pInter2 = pInter2->suivant;
 	}
 
 	return true;
