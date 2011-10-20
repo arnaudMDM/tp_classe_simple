@@ -37,7 +37,8 @@ void IntervalSet::Display ( )
 } //----- Fin de Display
 
 bool IntervalSet::Add ( long lLeft, long lRight )
-// Algorithme :
+// Algorithme : Traitement des cas particuliers (argument invalide, 0 élément
+// l'ensemble, 1er élément de la liste) puis cas général.
 {
 	if ( lLeft > lRight )
 	{
@@ -71,6 +72,8 @@ bool IntervalSet::Add ( long lLeft, long lRight )
 	}
 
 	IntervalSet * pInter = this;
+	IntervalSet * pInterRetour = this;
+	int nbInterNew = 2;
 
 	while (pInter != 0)
 	{
@@ -86,9 +89,18 @@ bool IntervalSet::Add ( long lLeft, long lRight )
 				pInterNew->suivant = pInter->suivant;
 
 				pInter->suivant = pInterNew;
-				pInter->nbInter++;
+				while(pInterRetour != pInterNew)
+				{
+					pInterRetour->nbInter = nbInterNew;
+					nbInterNew -= 1;
+					pInterRetour = pInterRetour->suivant;
+				}
 
 				return true;
+			}
+			else
+			{
+				nbInterNew+=1;
 			}
 		}
 		else {
@@ -145,7 +157,7 @@ bool IntervalSet::Add ( IntervalSet& is2 )
 
 bool IntervalSet::Remove ( long lPos )
 // Algorithme : Traitement des cas particuliers (argument invalide, 1er élément
-// de la liste ou liste d'un seul élément) puis cas général
+// de la liste ou liste d'un seul élément) puis cas général.
 {
 	if ( lPos < 0 || lPos >= Count ( ) )
 	{
@@ -214,7 +226,8 @@ bool IntervalSet::GetInterval ( long lPos, long& lLeft, long& lRight ) const
 } //----- Fin de GetInterval
 
 IntervalSet& IntervalSet::Union ( IntervalSet& is2 )
-// Algorithme : trivial
+// Algorithme : Traitement des cas particuliers (aucun intervalle dans un
+//ensemble ou dans les deux )puis cas général.
 {
 	if ( Count ( ) == 0 )
 	{
@@ -233,7 +246,7 @@ IntervalSet& IntervalSet::Union ( IntervalSet& is2 )
 
 	int borneInfNew, borneSupNew;
 	int nbInterNew = 0;
-
+//Cas général
 	while (pInter != 0 && pInter2 != 0)
 	{
 		if ( pInter2->borneSup < pInter->borneInf )
@@ -348,7 +361,8 @@ IntervalSet& IntervalSet::Union ( IntervalSet& is2 )
 } //----- Fin de Union
 
 IntervalSet& IntervalSet::Intersection ( IntervalSet& is2 )
-// Algorithme : trivial
+// Algorithme : Traitement des cas particuliers (aucun intervalle dans un
+//ensemble ou dans les deux )puis cas général.
 {
 	if ( Count ( ) == 0 || is2.Count ( ) == 0 )
 	{
@@ -362,7 +376,7 @@ IntervalSet& IntervalSet::Intersection ( IntervalSet& is2 )
 
 	int borneInfNew, borneSupNew;
 	int nbInterNew = 0;
-
+//Cas général
 	while (pInter != 0 && pInter2 != 0)
 	{
 		if ( pInter2->borneSup < pInter->borneInf )

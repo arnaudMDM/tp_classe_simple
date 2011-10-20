@@ -55,6 +55,8 @@ int main ( )
 //	inter2.Add ( 5, 11 );
 //	inter2.Add ( 15, 17 );
 //
+//	inter2.Display();
+//
 //	IntervalSet inter3 = inter1.Intersection ( inter2 );
 
 //	inter1.Add ( -6, -4);
@@ -63,6 +65,8 @@ int main ( )
 //	inter1.Add ( 12, 18 );
 //	inter1.Add ( 23, 28 );
 //	inter1.Add ( 58, 63 );
+//
+//	inter1.Display();
 //
 //	inter2.Add ( 0, 1 );
 //	inter2.Add ( 5, 20 );
