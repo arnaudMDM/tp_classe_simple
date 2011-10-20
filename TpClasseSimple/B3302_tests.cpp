@@ -85,12 +85,12 @@ int main ( )
 
 	for ( int i = 1; i <= 100000; i++ )
 	{
-		val = (rand()/((RAND_MAX+1)/2.0)-1)*RAND_MAX*100;
-		val2 = (rand()/((RAND_MAX+1)/2.0)-1)*RAND_MAX*100;
+		val = rand()*70;
+		val2 = val+10;
 		inter1.Add ( val >= val2 ? val2 : val, val >= val2 ? val : val2 );
 
-		val = (rand()/((RAND_MAX+1)/2.0)-1)*RAND_MAX*100;
-		val2 = (rand()/((RAND_MAX+1)/2.0)-1)*RAND_MAX*100;
+		val = rand()*70;
+		val2 = val+10;
 		inter2.Add ( val >= val2 ? val2 : val, val >= val2 ? val : val2 );
 
 		//cout << "Itération n° : " << i << endl;
