@@ -85,15 +85,15 @@ int main ( )
 
 	for ( int i = 1; i <= 100000; i++ )
 	{
-		val = rand()*70;
+		val = rand()*700;
 		val2 = val+10;
 		inter1.Add ( val >= val2 ? val2 : val, val >= val2 ? val : val2 );
 
-		val = rand()*70;
+		val = rand()*700;
 		val2 = val+10;
 		inter2.Add ( val >= val2 ? val2 : val, val >= val2 ? val : val2 );
 
-		//cout << "Itération n° : " << i << endl;
+		cout << "Itération n° : " << i << endl;
 	}
 
 	cout << "Nb d'éléments de inter1 : " << inter1.Count ( ) << endl;
