@@ -20,31 +20,33 @@ using namespace std;
 
 //----------------------------------------------------- Méthodes publiques
 void IntervalSet::Display ( )
-// Algorithme : trivial
+// Algorithme : Trivial
 {
-	IntervalSet * pInter = this;
 	if ( Count ( ) > 0 )
 	{
-		do
+		IntervalSet * pInter = this;
+		while (pInter != 0)
 		{
 			cout << "[ " << pInter->borneInf << ", " << pInter->borneSup << " ]"
 			        << endl;
 			pInter = pInter->suivant;
 		}
-		while (pInter != 0);
 	}
 	cout << "Nombre d'intervalles : " << Count ( ) << endl;
 } //----- Fin de Display
 
 bool IntervalSet::Add ( long lLeft, long lRight )
-// Algorithme : Traitement des cas particuliers (argument invalide, 0 élément
-// l'ensemble, 1er élément de la liste) puis cas général.
+// Algorithme : Traitement des cas particuliers (arguments invalide, aucun
+// élément dans l'ensemble, élément à insérer au début de la liste) puis cas
+// général
 {
+	// cas où les arguments invalides
 	if ( lLeft > lRight )
 	{
 		return false;
 	}
 
+	// cas où l'ensemble de départ vide
 	if ( Count ( ) == 0 )
 	{
 		borneInf = lLeft;
@@ -54,6 +56,7 @@ bool IntervalSet::Add ( long lLeft, long lRight )
 		return true;
 	}
 
+	// cas ou l'élément doit être inséré en début de liste
 	if ( lRight < borneInf )
 	{
 		IntervalSet * pInterNew = new IntervalSet ( );
@@ -71,8 +74,8 @@ bool IntervalSet::Add ( long lLeft, long lRight )
 		return true;
 	}
 
+	// cas général
 	IntervalSet * pInter = this;
-	IntervalSet * pInterRetour = this;
 	int nbInterNew = 2;
 
 	while (pInter != 0)
@@ -81,6 +84,17 @@ bool IntervalSet::Add ( long lLeft, long lRight )
 		{
 			if ( pInter->suivant == 0 || lRight < pInter->suivant->borneInf )
 			{
+				/*
+				Si on trouve l'endroit où insérer le nouvel intervalle, on
+				procède de cette manière : on crée dynamiquement un nouvel
+				intervalle qui va venir remplacer le "suivant" de
+				l'intervalle précédant le point d'insertion. En tant que
+				"suivant" du nouvel intervalle, on choisit l'intervalle qui
+				suit le point d'insertion (de cette manière, si l'intervalle
+				est ajouté en fin de liste, un 0 sera affecté au pointeur
+				sans opération spécifique).
+				 */
+
 				IntervalSet * pInterNew = new IntervalSet ( );
 
 				pInterNew->borneInf = lLeft;
@@ -89,11 +103,16 @@ bool IntervalSet::Add ( long lLeft, long lRight )
 				pInterNew->suivant = pInter->suivant;
 
 				pInter->suivant = pInterNew;
-				while(pInterRetour != pInterNew)
+
+				// On parcourt à nouveau la liste jusqu'à l'ensemble ajouté pour
+				// mettre à jour le nombre d'éléments de chaque IntervalSet de
+				// la liste
+				IntervalSet * pInter2 = this;
+				while(pInter2 != pInterNew)
 				{
-					pInterRetour->nbInter = nbInterNew;
+					pInter2->nbInter = nbInterNew;
 					nbInterNew--;
-					pInterRetour = pInterRetour->suivant;
+					pInter2 = pInter2->suivant;
 				}
 
 				return true;
@@ -114,7 +133,10 @@ bool IntervalSet::Add ( long lLeft, long lRight )
 } //----- Fin de Add
 
 bool IntervalSet::Add ( IntervalSet& is2 )
-// Algorithme : trivial
+// Algorithme : Les ajouts ne doivent être effectués que s'ils sont tous
+// possibles. Après avoir testé que l'IntervalSet passé en paramètre n'est
+// pas vide, on parcourt les deux intervalSet en même temps pour savoir s'il y
+// a collision à un moment ou un autre entre deux intervalles.
 {
 	if ( is2.Count ( ) == 0 )
 	{
@@ -136,12 +158,16 @@ bool IntervalSet::Add ( IntervalSet& is2 )
 			{
 				pInter = pInter->suivant;
 			}
+			// si aucune des deux conditions précédentes n'est validée, c'est
+			// qu'il y a collision et que l'ajout ne pourra pas se faire; on
+			// sort donc immédiatement de la fonction
 			else
 			{
 				return false;
 			}
 		}
 	}
+
 	// si on sort de la boucle, cela signifie que l'ajout peut être réalisé
 
 	pInter2 = &is2;
@@ -156,22 +182,27 @@ bool IntervalSet::Add ( IntervalSet& is2 )
 } //----- Fin de Add
 
 bool IntervalSet::Remove ( long lPos )
-// Algorithme : Traitement des cas particuliers (argument invalide, 1er élément
-// de la liste ou liste d'un seul élément) puis cas général.
+// Algorithme : Traitement des cas particuliers (argument invalide, liste de 0
+// ou 1 intervalle ou liste d'un seul élément) puis cas général
 {
+	// cas où lPos est invalide et où la liste est vide
 	if ( lPos < 0 || lPos >= Count ( ) )
 	{
 		return false;
 	}
 
+	// cas où la liste ne contient qu'un seul intervalle
 	if ( Count ( ) == 1 )
 	{
 		nbInter--;
 		return true;
 	}
 
+	// cas où on souhaite supprimer le premier intervalle de la liste
 	if ( lPos == 0 )
 	{
+		// on recopie le deuxième élément dans le premier puis on supprime le
+		// deuxième
 		borneInf = suivant->borneInf;
 		borneSup = suivant->borneSup;
 		Remove ( 1 );
@@ -179,7 +210,9 @@ bool IntervalSet::Remove ( long lPos )
 	}
 
 	IntervalSet * pInter = this;
-	// on souhaite se placer juste avant l'élément à supprimer
+	// on souhaite se placer juste avant l'élément à supprimer, on en profite
+	// pour mettre à jour le nombre d'élements des intervalSet précédant celui
+	// que l'on souhaite supprimer
 	for ( int i = 1; i < lPos; i++ )
 	{
 		pInter->nbInter--;
@@ -190,8 +223,10 @@ bool IntervalSet::Remove ( long lPos )
 	IntervalSet * pInterSuppr = pInter->suivant;
 
 	pInter->suivant = pInter->suivant->suivant;
-	pInterSuppr->suivant = 0; // on "casse" le lien pour éviter une suppression
-	// en cascade lors de l'appel du destructeur
+
+	// on "casse" le lien pour éviter une suppression en cascade lors de
+	// l'appel du destructeur
+	pInterSuppr->suivant = 0;
 
 	delete pInterSuppr;
 
@@ -206,7 +241,8 @@ long IntervalSet::Count ( ) const
 } //----- Fin de Count
 
 bool IntervalSet::GetInterval ( long lPos, long& lLeft, long& lRight ) const
-// Algorithme : trivial
+// Algorithme : Test de la validité des arguments puis parcourt jusqu'à
+// l'intervalle voulu
 {
 	if ( lPos < 0 || lPos >= Count ( ) )
 	{
@@ -226,8 +262,8 @@ bool IntervalSet::GetInterval ( long lPos, long& lLeft, long& lRight ) const
 } //----- Fin de GetInterval
 
 IntervalSet& IntervalSet::Union ( IntervalSet& is2 )
-// Algorithme : Traitement des cas particuliers (aucun intervalle dans un
-//ensemble ou dans les deux )puis cas général.
+// Algorithme : Traitement des cas particuliers (aucun intervalle dans un des
+// ensembles) puis cas général
 {
 	if ( Count ( ) == 0 )
 	{
@@ -241,12 +277,16 @@ IntervalSet& IntervalSet::Union ( IntervalSet& is2 )
 
 	IntervalSet * pInter = this;
 	IntervalSet * pInter2 = &is2;
+	// on initialise la liste de retour avec un IntervalSet vide de manière à
+	// disposer dès le début de pInterNew->suivant et ainsi éviter le traitement
+	// dans le cas général du cas particulier où la liste de retour est encore
+	// vide
 	IntervalSet * pInterRetour = new IntervalSet ( );
 	IntervalSet * pInterNew = pInterRetour;
 
 	int borneInfNew, borneSupNew;
 	int nbInterNew = 0;
-//Cas général
+
 	while (pInter != 0 && pInter2 != 0)
 	{
 		if ( pInter2->borneSup < pInter->borneInf )
@@ -475,8 +515,6 @@ IntervalSet::~IntervalSet ( )
 	{
 		Remove(1);
 	}
-
-	// Attention, les objets seront supprimés en cascade au sein d'un intervalle
 } //----- Fin de ~IntervalSet
 
 //------------------------------------------------------------------ PRIVE
