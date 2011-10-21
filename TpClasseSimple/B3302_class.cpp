@@ -12,7 +12,7 @@ using namespace std;
 #include <iostream>
 
 //------------------------------------------------------ Include personnel
-#include "IntervalSet.h"
+#include "B3302_class.h"
 
 //------------------------------------------------------------- Constantes
 

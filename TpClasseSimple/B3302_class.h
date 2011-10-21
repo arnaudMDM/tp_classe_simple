@@ -102,7 +102,7 @@ public:
 
 	IntervalSet& Union ( IntervalSet& is );
 	// Mode d'emploi :
-	//	Renvoie un nouvel ensemble d'intervalles qui est le résultat de
+	//	Renvoie un nouvel objet IntervalSet qui est le résultat de
 	// l'union de l'ensemble de l'objet appelant cette méthode et de l'ensemble
 	// is. Il s'agit d'une union au sens mathématique.
 	//
@@ -111,7 +111,7 @@ public:
 
 	IntervalSet& Intersection ( IntervalSet& is );
 	// Mode d'emploi :
-	//	Renvoie un nouvel ensemble d'intervalle qui est le résultat de
+	//	Renvoie un nouvel objet IntervalSet qui est le résultat de
 	// l'intersection de l'ensemble de l'objet appelant cette méthode et de
 	// l'ensemble is. Il s'agit d'une intersection au sens mathématique.
 	//
