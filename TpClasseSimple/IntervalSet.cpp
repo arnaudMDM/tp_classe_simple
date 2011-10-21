@@ -19,7 +19,7 @@ using namespace std;
 //----------------------------------------------------------------- PUBLIC
 
 //----------------------------------------------------- Méthodes publiques
-void IntervalSet::Display ( )
+void IntervalSet::Display ( ) const
 // Algorithme : Trivial
 {
 	if ( Count ( ) > 0 )
@@ -264,7 +264,8 @@ bool IntervalSet::GetInterval ( long lPos, long& lLeft, long& lRight ) const
 
 IntervalSet& IntervalSet::Union ( IntervalSet& is2 )
 // Algorithme : Traitement des cas particuliers (aucun intervalle dans un des
-// ensembles) puis cas général
+// ensembles) puis cas général : parcourt simultané des deux ensembles triés et
+// écriture progressive du résultat dans un nouvel ensemble. Complexité en O(n)
 {
 	if ( Count ( ) == 0 )
 	{
@@ -278,6 +279,7 @@ IntervalSet& IntervalSet::Union ( IntervalSet& is2 )
 
 	IntervalSet * pInter = this;
 	IntervalSet * pInter2 = &is2;
+
 	// on initialise la liste de retour avec un IntervalSet vide de manière à
 	// disposer dès le début de pInterNew->suivant et ainsi éviter le traitement
 	// dans le cas général du cas particulier où la liste de retour est encore
@@ -290,6 +292,7 @@ IntervalSet& IntervalSet::Union ( IntervalSet& is2 )
 
 	while (pInter != 0 && pInter2 != 0)
 	{
+		// premier cas sans intersection des deux intervalles courants
 		if ( pInter2->borneSup < pInter->borneInf )
 		{
 			pInterNew->suivant = new IntervalSet ( );
@@ -300,6 +303,7 @@ IntervalSet& IntervalSet::Union ( IntervalSet& is2 )
 
 			pInter2 = pInter2->suivant;
 		}
+		// deuxième cas sans intersection des deux intervalles courants
 		else if ( pInter2->borneInf > pInter->borneSup )
 		{
 			pInterNew->suivant = new IntervalSet ( );
@@ -310,50 +314,54 @@ IntervalSet& IntervalSet::Union ( IntervalSet& is2 )
 
 			pInter = pInter->suivant;
 		}
+		// cas avec intersection des intervalles courants
 		else
 		{
+			// on mémorise le maximum des bornes inférieures
 			borneInfNew =
 			        pInter->borneInf <= pInter2->borneInf ? pInter->borneInf :
 			                pInter2->borneInf;
 
 			bool finCroisement = false;
 
+			// on boucle tant qu'il y a intersection
 			while (pInter != 0 && pInter2 != 0 && !finCroisement)
 			{
+				// premier cas de fin d'intersection
 				if ( pInter2->borneSup < pInter->borneInf )
 				{
 					borneSupNew = pInter2->borneSup;
 					pInter2 = pInter2->suivant;
 					finCroisement = true;
 				}
+				// deuxième cas de fin d'intersection
 				else if ( pInter2->borneInf > pInter->borneSup )
 				{
 					borneSupNew = pInter->borneSup;
 					pInter = pInter->suivant;
 					finCroisement = true;
 				}
+				// premier cas de poursuite d'intersection
 				else if ( pInter2->borneSup > pInter->borneSup )
 				{
 					pInter = pInter->suivant;
 				}
-				else if ( pInter2->borneSup < pInter->borneSup )
-				{
-					pInter2 = pInter2->suivant;
-				}
+				// deuxième cas de poursuite d'intersection
 				else
 				{
-					borneSupNew = pInter->borneSup;
-					pInter = pInter->suivant;
 					pInter2 = pInter2->suivant;
-					finCroisement = true;
 				}
 			}
 
+			// premier cas de fin de parcours d'un ensemble pendant une
+			// intersection
 			if ( pInter == 0 && !finCroisement )
 			{
 				borneSupNew = pInter2->borneSup;
 				pInter2 = pInter2->suivant;
 			}
+			// deuxième cas de fin de parcours d'un ensemble pendant une
+			// intersection
 			else if ( pInter2 == 0 && !finCroisement )
 			{
 				borneSupNew = pInter->borneSup;
@@ -364,6 +372,7 @@ IntervalSet& IntervalSet::Union ( IntervalSet& is2 )
 			pInterNew = pInterNew->suivant;
 			pInterNew->borneInf = borneInfNew;
 			pInterNew->borneSup = borneSupNew;
+
 			nbInterNew++;
 
 		}
@@ -383,19 +392,21 @@ IntervalSet& IntervalSet::Union ( IntervalSet& is2 )
 	if ( pInter3 != 0 )
 	{
 		// on appelle le constructeur de copie car la fin de pInterNew sera
-		// équivalente au reste de la liste d'intervalle non parcourue
+		// équivalente au reste de l'ensemble d'intervalles non parcouru
 		// entièrement
 		pInterNew->suivant = new IntervalSet ( *pInter3 );
 		nbInterNew += pInterNew->suivant->Count ( );
 	}
 
+	// on supprime l'ensemble vide au début de l'ensemble de retour puis on
+	// parcourt cet ensemble pour mettre à jour les nbInter
 	if ( pInterRetour->suivant != 0 )
 	{
 		pInter = pInterRetour;
 		pInterRetour = pInterRetour->suivant;
 		// on "casse" le lien pour éviter une destruction en cascade
 		pInter->suivant = 0;
-		delete (pInter);
+		delete pInter;
 
 		pInter = pInterRetour;
 		while (pInter != 0)
@@ -409,8 +420,9 @@ IntervalSet& IntervalSet::Union ( IntervalSet& is2 )
 } //----- Fin de Union
 
 IntervalSet& IntervalSet::Intersection ( IntervalSet& is2 )
-// Algorithme : Traitement des cas particuliers (aucun intervalle dans un
-//ensemble ou dans les deux )puis cas général.
+// Algorithme : Traitement des cas particuliers (aucun intervalle dans un des
+// ensembles) puis cas général : parcourt simultané des deux ensembles triés et
+// écriture progressive du résultat dans un nouvel ensemble. Complexité en O(n)
 {
 	if ( Count ( ) == 0 || is2.Count ( ) == 0 )
 	{
@@ -419,27 +431,37 @@ IntervalSet& IntervalSet::Intersection ( IntervalSet& is2 )
 
 	IntervalSet * pInter = this;
 	IntervalSet * pInter2 = &is2;
+
+	// on initialise la liste de retour avec un IntervalSet vide de manière à
+	// disposer dès le début de pInterNew->suivant et ainsi éviter le traitement
+	// dans le cas général du cas particulier où la liste de retour est encore
+	// vide
 	IntervalSet * pInterRetour = new IntervalSet ( );
 	IntervalSet * pInterNew = pInterRetour;
 
 	int borneInfNew, borneSupNew;
 	int nbInterNew = 0;
-	//Cas général
+
 	while (pInter != 0 && pInter2 != 0)
 	{
+		// premier cas sans intersection
 		if ( pInter2->borneSup < pInter->borneInf )
 		{
 			pInter2 = pInter2->suivant;
 		}
+		// deuxième cas sans intersection
 		else if ( pInter2->borneInf > pInter->borneSup )
 		{
 			pInter = pInter->suivant;
 		}
+		// cas avec intersection
 		else
 		{
+			// on mémorise la plus grande borne inférieure
 			borneInfNew =
 			        pInter->borneInf >= pInter2->borneInf ? pInter->borneInf :
 			                pInter2->borneInf;
+			// on mémorise la plus petite borne supérieure
 			borneSupNew =
 			        pInter->borneSup <= pInter2->borneSup ? pInter->borneSup :
 			                pInter2->borneSup;
@@ -461,13 +483,15 @@ IntervalSet& IntervalSet::Intersection ( IntervalSet& is2 )
 		}
 	}
 
+	// on supprime l'ensemble vide au début de l'ensemble de retour puis on
+	// parcourt cet ensemble pour mettre à jour les nbInter
 	if ( pInterRetour->suivant != 0 )
 	{
 		pInter = pInterRetour;
 		pInterRetour = pInterRetour->suivant;
 		// on "casse" le lien pour éviter une destruction en cascade
 		pInter->suivant = 0;
-		delete (pInter);
+		delete pInter;
 
 		pInter = pInterRetour;
 		while (pInter != 0)
@@ -489,6 +513,7 @@ IntervalSet::IntervalSet ( const IntervalSet & is )
 #ifdef MAP
 	cout << "Appel au constructeur de copie de <IntervalSet>" << endl;
 #endif
+
 	borneSup = is.borneSup;
 	borneInf = is.borneInf;
 	nbInter = is.nbInter;
@@ -512,17 +537,13 @@ IntervalSet::IntervalSet ( ) :
 } //----- Fin de IntervalSet
 
 IntervalSet::~IntervalSet ( )
-// Algorithme :trivial
-//
+// Algorithme : trivial
 {
 #ifdef MAP
 	cout << "Appel au destructeur de <IntervalSet>" << endl;
 #endif
 
-	while (suivant != 0)
-	{
-		Remove ( 1 );
-	}
+	delete suivant;
 } //----- Fin de ~IntervalSet
 
 //------------------------------------------------------------------ PRIVE
