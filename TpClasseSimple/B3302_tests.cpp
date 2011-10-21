@@ -2,7 +2,7 @@
  B3302_tests  -  description
  -------------------
  début                : 7 oct. 2011
- copyright            : (C) 2011 par rgicquel
+ copyright            : (C) 2011 par Robin Gicquel et Arnaud Mery de Montigny
  *************************************************************************/
 
 //---------- Réalisation du module <B3302_tests> (fichier B3302_tests.cpp) -----
@@ -24,103 +24,199 @@ using namespace std;
 //---------------------------------------------------- Variables statiques
 
 //------------------------------------------------------ Fonctions privées
-//static type nom ( liste de paramètres )
-// Mode d'emploi :
-//
-// Contrat :
-//
-// Algorithme :
-//
-//{
-//} //----- fin de nom
 
 //////////////////////////////////////////////////////////////////  PUBLIC
 
 //---------------------------------------------------- Fonctions publiques
 
 int main ( )
-// Algorithme : trivial
+// Algorithme : réalisation des tests tels qu'ils sont décrits dans les
+// spécifications de IntervalSet
 {
-	IntervalSet * pInter1;
-	IntervalSet * pInter2;
-	IntervalSet * pInter3;
+	int nTest;
 
+	IntervalSet inter1;
+	IntervalSet inter2;
+	IntervalSet inter3;
 
+	//test 101
+	nTest = 101;
 
-	//test_101
-	pInter1 = new IntervalSet ( );
-	if ( pInter1->Count ( ) == 0 )
+	inter1 = IntervalSet ( );
+
+	if ( inter1.Count ( ) == 0 )
 	{
-		cout << "Test 101 : OK" << endl;
+		cout << "Test " << nTest << " : OK" << endl;
 	}
 	else
 	{
-		cout << "Test 101 : Erreur" << endl;
+		cout << "Test " << nTest << " : Erreur" << endl;
 	}
-	delete pInter1;
 
-	//test_102
-	pInter1 = new IntervalSet ( );
+	//test 102
+	nTest = 102;
+
+	inter1 = IntervalSet ( );
+
 	for ( int i = 1; i <= 10000; i++ )
 	{
-		pInter1->Add ( (i * 10), (i * 10 + 1) );
+		inter1.Add ( (i * 10), (i * 10 + 1) );
 	}
-	if ( pInter1->Count ( ) == 10000 )
+	if ( inter1.Count ( ) == 10000 )
 	{
-		cout << "Test 102 : OK" << endl;
+		cout << "Test " << nTest << " : OK" << endl;
 	}
 	else
 	{
-		cout << "Test 102 : Erreur" << endl;
+		cout << "Test " << nTest << " : Erreur" << endl;
 	}
-	delete pInter1;
 
-	//test_201
-	pInter1 = new IntervalSet ( );
-	pInter2 = new IntervalSet ( );
-	pInter3 = new IntervalSet ( );
+	//test 201
+	nTest = 201;
 
-	*pInter3 = pInter1->Union ( *pInter2 );
+	inter1 = IntervalSet ( );
+	inter2 = IntervalSet ( );
 
-	if ( pInter3->Count ( ) == 0 )
+	inter3 = inter1.Union ( inter2 );
+
+	if ( inter3.Count ( ) == 0 )
 	{
-		cout << "Test 201 : Ok" << endl;
+		cout << "Test " << nTest << " : OK" << endl;
 	}
 	else
 	{
-		cout << "Test 201 : Erreur" << endl;
+		cout << "Test " << nTest << " : Erreur" << endl;
 	}
-	delete (pInter1);
-	delete (pInter2);
-	delete (pInter3);
 
-//	//test_202
-//	pInter1 = new IntervalSet ( );
-//		pInter2 = new IntervalSet ( );
-//		pInter3 = new IntervalSet ( );
-//		for ( int i = 1; i <= 10000; i++ )
-//			{
-//				pInter2->Add ( i * 10, i * 11 );
-//			}
-//
-//		*pInter3 = pInter1->Union ( *pInter2 );
-//
-//		bool identique = true;
-//		while (pInter2->suivant != 0 && pInter3->suivant != 0 && identique)
-//		{
-//			if (pInter2->)
-//		}
-//		if ( pInter3 == pinter  )
-//		{
-//			cout << "Test 201 : Ok" << endl;
-//		}
-//		else
-//		{
-//				cout << "Test 201 : Erreur" << endl;
-//			}
-//		delete(pInter1);
-//		delete(pInter2);
-//		delete(pInter3);
+	//test 202
+	nTest = 202;
+
+	inter1 = IntervalSet ( );
+	inter2 = IntervalSet ( );
+
+	for ( int i = 1; i <= 30; i++ )
+	{
+		inter2.Add ( i * 10, i * 11 );
+	}
+
+	inter3 = inter1.Union ( inter2 );
+
+	if ( inter2.Count ( ) == inter3.Count ( ) )
+	{
+		int nbInter = inter2.Count ( );
+		long borneInf1, borneInf2, borneSup1, borneSup2;
+		bool erreur = false;
+
+		for ( long i = 0; i < nbInter && !erreur; i++ )
+		{
+			inter3.GetInterval ( i, borneInf1, borneSup1 );
+			inter2.GetInterval ( i, borneInf2, borneSup2 );
+
+			if ( borneInf1 != borneInf2 || borneSup1 != borneSup2 )
+			{
+				cout << "Test " << nTest << " : Erreur" << endl;
+				erreur = true;
+			}
+		}
+
+		if ( !erreur )
+		{
+			cout << "Test " << nTest << " : OK" << endl;
+		}
+	}
+	else
+	{
+		cout << "Test " << nTest << " : Erreur" << endl;
+	}
+
+	//test 203
+	nTest = 203;
+
+	inter1 = IntervalSet ( );
+	inter2 = IntervalSet ( );
+
+	for ( int i = 1; i <= 30; i++ )
+	{
+		inter1.Add ( i * 10, i * 11 );
+	}
+
+	inter3 = inter1.Union ( inter2 );
+
+	if ( inter1.Count ( ) == inter3.Count ( ) )
+	{
+		int nbInter = inter1.Count ( );
+		long borneInf1, borneInf2, borneSup1, borneSup2;
+		bool erreur = false;
+
+		for ( long i = 0; i < nbInter && !erreur; i++ )
+		{
+			inter3.GetInterval ( i, borneInf1, borneSup1 );
+			inter1.GetInterval ( i, borneInf2, borneSup2 );
+
+			if ( borneInf1 != borneInf2 || borneSup1 != borneSup2 )
+			{
+				cout << "Test " << nTest << " : Erreur" << endl;
+				erreur = true;
+			}
+
+		}
+
+		if ( !erreur )
+		{
+			cout << "Test " << nTest << " : OK" << endl;
+		}
+	}
+	else
+	{
+		cout << "Test " << nTest << " : Erreur" << endl;
+	}
+
+	//test 204
+	nTest = 204;
+
+	inter1 = IntervalSet ( );
+	inter2 = IntervalSet ( );
+
+	for ( int i = 1; i <= 30; i++ )
+	{
+		inter1.Add ( i * 10, i * 11 );
+	}
+
+	inter2 = IntervalSet ( inter1 );
+
+	inter3 = inter1.Union ( inter2 );
+
+	if ( inter1.Count ( ) == inter3.Count ( ) )
+	{
+
+		int nbInter = inter1.Count ( );
+
+		long borneInf1, borneInf2, borneSup1, borneSup2;
+		bool erreur = false;
+
+		for ( long i = 0; i < nbInter && !erreur; i++ )
+		{
+
+			inter1.GetInterval ( i, borneInf1, borneSup1 );
+			inter3.GetInterval ( i, borneInf2, borneSup2 );
+
+			if ( borneInf1 != borneInf2 || borneSup1 != borneSup2 )
+			{
+				cout << "Test " << nTest << " : Erreur" << endl;
+				erreur = true;
+			}
+
+		}
+
+		if ( !erreur )
+		{
+			cout << "Test " << nTest << " : OK" << endl;
+		}
+	}
+	else
+	{
+		cout << "Test " << nTest << " : Erreur" << endl;
+	}
 
 //	inter1.Add ( -18, -14 );
 //	inter1.Add ( -5, 2 );

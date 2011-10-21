@@ -2,7 +2,7 @@
  IntervalSet  -  description
  -------------------
  début                : 7 oct. 2011
- copyright            : (C) 2011 par rgicquel
+ copyright            : (C) 2011 par Robin Gicquel et Arnaud Mery de Montigny
  *************************************************************************/
 
 //---------- Réalisation de la classe <IntervalSet> (fichier IntervalSet.cpp) --
@@ -85,14 +85,14 @@ bool IntervalSet::Add ( long lLeft, long lRight )
 			if ( pInter->suivant == 0 || lRight < pInter->suivant->borneInf )
 			{
 				/*
-				Si on trouve l'endroit où insérer le nouvel intervalle, on
-				procède de cette manière : on crée dynamiquement un nouvel
-				intervalle qui va venir remplacer le "suivant" de
-				l'intervalle précédant le point d'insertion. En tant que
-				"suivant" du nouvel intervalle, on choisit l'intervalle qui
-				suit le point d'insertion (de cette manière, si l'intervalle
-				est ajouté en fin de liste, un 0 sera affecté au pointeur
-				sans opération spécifique).
+				 Si on trouve l'endroit où insérer le nouvel intervalle, on
+				 procède de cette manière : on crée dynamiquement un nouvel
+				 intervalle qui va venir remplacer le "suivant" de
+				 l'intervalle précédant le point d'insertion. En tant que
+				 "suivant" du nouvel intervalle, on choisit l'intervalle qui
+				 suit le point d'insertion (de cette manière, si l'intervalle
+				 est ajouté en fin de liste, un 0 sera affecté au pointeur
+				 sans opération spécifique).
 				 */
 
 				IntervalSet * pInterNew = new IntervalSet ( );
@@ -108,7 +108,7 @@ bool IntervalSet::Add ( long lLeft, long lRight )
 				// mettre à jour le nombre d'éléments de chaque IntervalSet de
 				// la liste
 				IntervalSet * pInter2 = this;
-				while(pInter2 != pInterNew)
+				while (pInter2 != pInterNew)
 				{
 					pInter2->nbInter = nbInterNew;
 					nbInterNew--;
@@ -122,7 +122,8 @@ bool IntervalSet::Add ( long lLeft, long lRight )
 				nbInterNew++;
 			}
 		}
-		else {
+		else
+		{
 			return false;
 		}
 
@@ -267,12 +268,12 @@ IntervalSet& IntervalSet::Union ( IntervalSet& is2 )
 {
 	if ( Count ( ) == 0 )
 	{
-		return *(new IntervalSet ( *this ));
+		return *(new IntervalSet ( is2 ));
 	}
 
 	if ( is2.Count ( ) == 0 )
 	{
-		return *(new IntervalSet ( is2 ));
+		return *(new IntervalSet ( *this ));
 	}
 
 	IntervalSet * pInter = this;
@@ -331,13 +332,20 @@ IntervalSet& IntervalSet::Union ( IntervalSet& is2 )
 					pInter = pInter->suivant;
 					finCroisement = true;
 				}
-				else if ( pInter2->borneSup >= pInter->borneSup )
+				else if ( pInter2->borneSup > pInter->borneSup )
 				{
 					pInter = pInter->suivant;
 				}
-				else
+				else if ( pInter2->borneSup < pInter->borneSup )
 				{
 					pInter2 = pInter2->suivant;
+				}
+				else
+				{
+					borneSupNew = pInter->borneSup;
+					pInter = pInter->suivant;
+					pInter2 = pInter2->suivant;
+					finCroisement = true;
 				}
 			}
 
@@ -416,7 +424,7 @@ IntervalSet& IntervalSet::Intersection ( IntervalSet& is2 )
 
 	int borneInfNew, borneSupNew;
 	int nbInterNew = 0;
-//Cas général
+	//Cas général
 	while (pInter != 0 && pInter2 != 0)
 	{
 		if ( pInter2->borneSup < pInter->borneInf )
@@ -511,9 +519,9 @@ IntervalSet::~IntervalSet ( )
 	cout << "Appel au destructeur de <IntervalSet>" << endl;
 #endif
 
-	while(suivant != 0)
+	while (suivant != 0)
 	{
-		Remove(1);
+		Remove ( 1 );
 	}
 } //----- Fin de ~IntervalSet
 
