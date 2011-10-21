@@ -24,7 +24,7 @@ void IntervalSet::Display ( ) const
 {
 	if ( Count ( ) > 0 )
 	{
-		IntervalSet * pInter = this;
+		const IntervalSet * pInter = this;
 		while (pInter != 0)
 		{
 			cout << "[ " << pInter->borneInf << ", " << pInter->borneSup << " ]"
@@ -505,10 +505,29 @@ IntervalSet& IntervalSet::Intersection ( IntervalSet& is2 )
 } //----- Fin de Intersection
 
 //------------------------------------------------- Surcharge d'opérateurs
+IntervalSet & IntervalSet::operator = ( const IntervalSet & is )
+// Algorithme : Trivial
+{
+	delete suivant;
+
+	borneSup = is.borneSup;
+	borneInf = is.borneInf;
+	nbInter = is.nbInter;
+	if ( is.suivant != 0 )
+	{
+		suivant = new IntervalSet ( *is.suivant );
+	}
+	else
+	{
+		suivant = 0;
+	}
+
+	return *this;
+} //----- Fin de operator =
 
 //-------------------------------------------- Constructeurs - destructeur
 IntervalSet::IntervalSet ( const IntervalSet & is )
-// Algorithme : trivial
+// Algorithme : Trivial
 {
 #ifdef MAP
 	cout << "Appel au constructeur de copie de <IntervalSet>" << endl;
@@ -529,7 +548,7 @@ IntervalSet::IntervalSet ( const IntervalSet & is )
 
 IntervalSet::IntervalSet ( ) :
 		nbInter ( 0 ), suivant ( 0 )
-// Algorithme : trivial
+// Algorithme : Trivial
 {
 #ifdef MAP
 	cout << "Appel au constructeur de <IntervalSet>" << endl;

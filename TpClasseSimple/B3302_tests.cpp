@@ -35,7 +35,9 @@ int main ( )
 {
 	int nTest;
 
-	IntervalSet inter1, inter2, inter3;
+	IntervalSet inter1;
+	IntervalSet inter2;
+	IntervalSet inter3;
 
 	//test 101
 	nTest = 101;
@@ -102,7 +104,12 @@ int main ( )
 	if ( inter2.Count ( ) == inter3.Count ( ) )
 	{
 		int nbInter = inter2.Count ( );
-		long borneInf1, borneInf2, borneSup1, borneSup2;
+
+		long borneInf1;
+		long borneInf2;
+		long borneSup1;
+		long borneSup2;
+
 		bool erreur = false;
 
 		for ( long i = 0; i < nbInter && !erreur; i++ )
@@ -143,7 +150,12 @@ int main ( )
 	if ( inter1.Count ( ) == inter3.Count ( ) )
 	{
 		int nbInter = inter1.Count ( );
-		long borneInf1, borneInf2, borneSup1, borneSup2;
+
+		long borneInf1;
+		long borneInf2;
+		long borneSup1;
+		long borneSup2;
+
 		bool erreur = false;
 
 		for ( long i = 0; i < nbInter && !erreur; i++ )
@@ -188,7 +200,11 @@ int main ( )
 
 		int nbInter = inter1.Count ( );
 
-		long borneInf1, borneInf2, borneSup1, borneSup2;
+		long borneInf1;
+		long borneInf2;
+		long borneSup1;
+		long borneSup2;
+
 		bool erreur = false;
 
 		for ( long i = 0; i < nbInter && !erreur; i++ )
@@ -256,7 +272,11 @@ int main ( )
 
 		int nbInter = inter1.Count ( );
 
-		long borneInf1, borneInf2, borneSup1, borneSup2;
+		long borneInf1;
+		long borneInf2;
+		long borneSup1;
+		long borneSup2;
+
 		bool erreur = false;
 
 		for ( long i = 0; i < nbInter && !erreur; i++ )

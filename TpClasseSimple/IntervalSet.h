@@ -119,6 +119,13 @@ public:
 	//	aucun
 
 	//------------------------------------------------- Surcharge d'opérateurs
+	IntervalSet & operator = ( const IntervalSet & is );
+	// Mode d'emploi :
+	//	Libère la mémoire utilisée par les éléments dynamiques du membre de
+	// gauche et réalise une copie du membre de droite dans le membre de gauche
+	//
+	// Contrat :
+	//	aucun
 
 	//-------------------------------------------- Constructeurs - destructeur
 	IntervalSet ( const IntervalSet& is );
@@ -150,10 +157,10 @@ protected:
 	//----------------------------------------------------- Méthodes protégées
 
 	//----------------------------------------------------- Attributs protégés
-	long borneInf;
-	long borneSup;
-	long nbInter;
-	IntervalSet *suivant;
+	long borneInf; // borne inférieure de l'intervalle
+	long borneSup; // borne supérieure de l'intervalle
+	long nbInter; // nombre d'intervalles contenus dans l'ensemble
+	IntervalSet *suivant; // pointeur sur l'élément suivant de l'ensemble
 };
 
 //--------------------------- Autres définitions dépendantes de <IntervalSet>
