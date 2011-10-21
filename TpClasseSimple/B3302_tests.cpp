@@ -10,8 +10,7 @@
 //-------------------------------------------------------- Include système
 using namespace std;
 #include <iostream>
-#include <cstdlib>
-#include <ctime>
+
 
 //------------------------------------------------------ Include personnel
 #include "IntervalSet.h"
